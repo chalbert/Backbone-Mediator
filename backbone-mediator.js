@@ -28,10 +28,13 @@
    */
   var channels = {};
 
+  /**
+   * @class
+   */
   Backbone.Mediator = {
 
     /**
-     * Subscribe to a global event
+     * Subscribe to a channel
      *
      * @param channel
      */
@@ -84,7 +87,7 @@
     },
 
     /**
-     * Currying for subscribing to one event only
+     * Subscribing to one event only
      *
      * @param channel
      * @param subscription
@@ -97,10 +100,18 @@
   };
 
   /**
-   * Shortcuts
+   * @lends Backbone.Mediator
    */
   _.extend(Backbone.Mediator, {
+    /**
+     * Shortcut for publish
+     * @function
+     */
     pub: Backbone.Mediator.publish,
+    /**
+     * Shortcut for subscribe
+     * @function
+     */
     sub: Backbone.Mediator.subscribe
   });
 
