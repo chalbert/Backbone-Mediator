@@ -1,0 +1,20 @@
+{
+  "author": "Kaleb Hornsby <kaleb@hornsby.ws> (kaleb.hornsby.ws)",
+  "name": "jsdoc",
+  "description": "JSDoc Toolkit",
+  "version": "0.0.1",
+  "homepage": "kaleb.hornsby.ws/jsdoc",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kaleb/node-jsdoc-toolkit.git"
+  },
+  "main": "app/run.js",
+  "scripts": {
+    "test": "app/test.js"
+  },
+  "engines": {
+    "node": ">=0.4"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
