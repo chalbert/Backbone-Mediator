@@ -43,8 +43,8 @@ view context.
 
     var View = Backbone.View.extend({
       subscriptions: {
-        'item:select: 'enable', // calls this.enable
-        'item:unselect: function(){...}
+        'item:select': 'enable', // calls this.enable
+        'item:unselect': function(){...}
       }
     });
     
