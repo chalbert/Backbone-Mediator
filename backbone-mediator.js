@@ -189,11 +189,18 @@
      * @function
      */
     pub: Backbone.Mediator.publish,
+    trigger: Backbone.Mediator.publish,
     /**
      * Shortcut for subscribe
      * @function
      */
-    sub: Backbone.Mediator.subscribe
+    sub: Backbone.Mediator.subscribe,
+    on: Backbone.Mediator.subscribe,
+    /**
+     * Shortcut for unsubscribe
+     * @function
+     */
+    off: Backbone.Mediator.unsubscribe
   });
 
   return Backbone;
