@@ -37,6 +37,14 @@
    * @class
    */
   Backbone.Mediator = {
+    /**
+     * Returns a list of channels w/ subscriptions
+     *
+     * @return {*}
+     */
+    getChannels: function() {
+      return channels;
+    },
 
     /**
      * Subscribe to a channel
@@ -80,7 +88,7 @@
 
     unsubscribe: function(channel, fn, context){
       if (!channels[channel]) return;
-
+      context = context || this;
       var subscription;
       for (var i = 0; i < channels[channel].length; i++) {
         subscription = channels[channel][i];
