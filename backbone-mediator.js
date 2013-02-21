@@ -6,6 +6,9 @@
  *
  *  <a href="https://github.com/chalbert/Backbone-Mediator">More details & documentation</a>
  *
+ * This is an updated version, available at:
+ * <a href="https://github.com/drc-devs/Backbone-Mediator">Github</a>
+ *
  * @author Nicolas Gilbert
  *
  * @requires _
