@@ -34,7 +34,9 @@
       /** @borrows Backbone.View#delegateEvents */
       delegateEvents = Backbone.View.prototype.delegateEvents,
       /** @borrows Backbone.View#delegateEvents */
-      undelegateEvents = Backbone.View.prototype.undelegateEvents;
+      undelegateEvents = Backbone.View.prototype.undelegateEvents,
+      /** @borrows Backbone.View#remove */
+      remove = Backbone.View.prototype.remove;
 
   /**
    * @class
@@ -140,6 +142,14 @@
     undelegateEvents: function(){
       undelegateEvents.apply(this, arguments);
       this.unsetSubscriptions();
+    },
+
+    /**
+     * Extend remove() to remove subscriptions.
+     */
+    remove: function(){
+      this.unsetSubscriptions();
+      remove.apply(this, arguments);
     },
 
     /** @property {Object} List of subscriptions, to be defined */
