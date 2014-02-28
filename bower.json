@@ -1,0 +1,17 @@
+{
+  "name": "tivie/Backbone-Mediator",
+  "version": "1.0.0",
+  "main": "backbone-mediator.js",
+  "description": "An Event Mediator Manager for Backbone library",
+  "license": "MIT",
+  "ignore": [
+    "docs",
+    "**/*.txt",
+    "libs",
+    "tests"
+  ],
+  "dependencies": {
+    "backbone": ">=1.1.2",
+    "underscore": ">=1.5.0"
+  }
+}
