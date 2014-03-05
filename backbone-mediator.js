@@ -52,7 +52,7 @@
      * Trigger all callbacks for a channel
      *
      * @param channel
-     * @params N Extra parametter to pass to handler
+     * @params N extra parameters to pass to handler
      */
     publish: function(channel) {
       if (!channels[channel]) return;
@@ -105,8 +105,8 @@
   };
 
   /**
-   * Allow to define convention-based subscriptions
-   * as an 'subscriptions' hash on a view. Subscriptions
+   * Allow definition of convention-based subscriptions
+   * as a 'subscriptions' hash on a view. Subscriptions
    * can then be easily setup and cleaned.
    *
    * @class
@@ -136,7 +136,7 @@
 
     /**
      * Subscribe to each subscription
-     * @param {Object} [subscriptions] An optional hash of subscription to add
+     * @param {Object} [subscriptions] An optional hash of subscriptions to add
      */
 
     setSubscriptions: function(subscriptions){
@@ -160,8 +160,8 @@
     },
 
     /**
-     * Unsubscribe to each subscription
-     * @param {Object} [subscriptions] An optional hash of subscription to remove
+     * Unsubscribe from each subscription
+     * @param {Object} [subscriptions] An optional hash of subscriptions to remove
      */
     unsetSubscriptions: function(subscriptions){
       subscriptions = subscriptions || this.subscriptions;
