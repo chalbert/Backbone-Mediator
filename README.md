@@ -1,4 +1,7 @@
-# Backbone-Mediator
+# backbone-mediator-chalbert
+
+Forked from Nicolas Gilbert's Backbone-Mediator to add support for commonjs and publish in npm directory.
+https://github.com/chalbert/Backbone-Mediator
 
 Backbone plugin to add app-wide pub/sub.
 

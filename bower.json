@@ -1,0 +1,14 @@
+{
+  "name": "backbone-mediator-chalbert",
+  "version": "1.0.0",
+  "description": "Backbone.js plugin to add app-wide pub/sub",
+  "authors": [
+    "Nicolas Gilbert"
+  ],
+  "license": "MIT",
+  "keywords": ["backbone", "backbonejs", "plugin", "mediator"],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bshack/Backbone-Mediator.git"
+  }
+}
