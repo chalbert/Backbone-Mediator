@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# Build documentation using Node-jsDoc-tookit
-docs/libs/jsdoc/app/run.js -a -t=docs/libs/jsdoc/templates/jsdoc -d=docs backbone-mediator.js

@@ -1,0 +1,26 @@
+{
+  "name": "backbone_mediator",
+  "description": "Backbone plugin to add app-wide pub/sub.",
+  "main": "dist/backbone-mediator.js",
+  "authors": [
+    "Nicolas Gilbert <nic.g.gilbert@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/chalbert/Backbone-Mediator",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node",
+    "es6"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "backbone": "^1.3.2"
+  }
+}
