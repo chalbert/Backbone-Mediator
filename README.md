@@ -26,7 +26,7 @@ Backbone plugin to add app-wide pub/sub.
 ### publish(channel [, arg1][, argN])
   *or shortcut pub()*
 
-  Execute all callbacks defined for a channel. Any addional argument will be tranfered to the callback.
+  Execute all callbacks defined for a channel. Any additional arguments will be transferred to the callback.
   
     Backbone.Mediator.publish('view:loaded', 'myView');
     
