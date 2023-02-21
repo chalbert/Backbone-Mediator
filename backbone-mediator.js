@@ -8,215 +8,156 @@
  *
  * This is an updated version, available at:
  * <a href="https://github.com/drc-devs/Backbone-Mediator">Github</a>
+ * Changelog:
+ *   2023-02-21
+ *     - Merged with 1.0.0 (54cb31a928d55a54c67ce34f697e365ec84b6279)
+ *     - Removed getChannels, as this is no longer used. This is all proxied to Backbone's eventing system.
  *
  * @author Nicolas Gilbert
  *
  * @requires _
  * @requires Backbone
  */
-(function(factory){
-  'use strict';
+import backbone from 'backbone';
+import underscore from 'underscore';
 
-  if (typeof define === 'function' && define.amd) {
-    define(['underscore', 'backbone'], factory);
-  } else {
-    factory(_, Backbone);
+// When running in global scope, we have to map manually...
+const Backbone = backbone || window.Backbone;
+const _ = underscore || window._;
+
+/**
+ * @static
+ */
+var
+  Subscriber,
+  /** @borrows Backbone.View#delegateEvents */
+  delegateEvents = Backbone.View.prototype.delegateEvents,
+  /** @borrows Backbone.View#delegateEvents */
+  undelegateEvents = Backbone.View.prototype.undelegateEvents,
+  /** @borrows Backbone.View#remove */
+  remove = Backbone.View.prototype.remove;
+
+/**
+ * @class
+ */
+Backbone.Mediator = _.extend({
+  subscribe: function (event, callback, context, once) {
+    if (once) {
+      return this.once(event, callback, context);
+    } else {
+      return this.on(event, callback, context);
+    }
+  },
+
+  publish: function (...args) {
+    return this.trigger(...args);
+  },
+
+  unsubscribe: function (...args) {
+    return this.off(...args);
+  },
+
+  subscribeOnce: function (...args) {
+    return this.once(...args);
   }
+}, Backbone.Events);
 
-})(function (_, Backbone){
-  'use strict';
-
-  /**
-   * @static
-   */
-  var channels = {},
-      Subscriber,
-      /** @borrows Backbone.View#delegateEvents */
-      delegateEvents = Backbone.View.prototype.delegateEvents,
-      /** @borrows Backbone.View#delegateEvents */
-      undelegateEvents = Backbone.View.prototype.undelegateEvents,
-      /** @borrows Backbone.View#remove */
-      remove = Backbone.View.prototype.remove;
+/**
+ * Allow to define convention-based subscriptions
+ * as an 'subscriptions' hash on a view. Subscriptions
+ * can then be easily setup and cleaned.
+ *
+ * @class
+ */
+Subscriber = {
 
   /**
-   * @class
+   * Extend delegateEvents() to set subscriptions
    */
-  Backbone.Mediator = {
-    /**
-     * Returns a list of channels w/ subscriptions
-     *
-     * @return {*}
-     */
-    getChannels: function() {
-      return channels;
-    },
+  delegateEvents: function () {
+    delegateEvents.apply(this, arguments);
+    this.setSubscriptions();
+  },
 
-    /**
-     * Subscribe to a channel
-     *
-     * @param channel
-     */
-    subscribe: function(channel, subscription, context, once) {
-      if (!channels[channel]) channels[channel] = [];
-      channels[channel].push({fn: subscription, context: context || this, once: once});
-    },
+  /**
+   * Extend undelegateEvents() to unset subscriptions
+   */
+  undelegateEvents: function () {
+    undelegateEvents.apply(this, arguments);
+    this.unsetSubscriptions();
+  },
 
-    /**
-     * Trigger all callbacks for a channel
-     *
-     * @param channel
-     * @params N Extra parametter to pass to handler
-     */
-    publish: function(channel) {
-      if (!channels[channel]) return;
+  /**
+   * Extend remove() to remove subscriptions.
+   */
+  remove: function(){
+    this.unsetSubscriptions();
+    remove.apply(this, arguments);
+  },
 
-      var args = [].slice.call(arguments, 1),
-          subscription;
+  /** @property {Object} List of subscriptions, to be defined */
+  subscriptions: {},
 
-      for (var i = 0; i < channels[channel].length; i++) {
-        subscription = channels[channel][i];
-        subscription.fn.apply(subscription.context, args);
-        if (subscription.once) {
-          Backbone.Mediator.unsubscribe(channel, subscription.fn, subscription.context);
-          i--;
-        }
+  /**
+   * Subscribe to each subscription
+   * @param {Object} [subscriptions] An optional hash of subscription to add
+   */
+
+  setSubscriptions: function (subscriptions) {
+    if (subscriptions) _.extend(this.subscriptions || {}, subscriptions);
+    subscriptions = subscriptions || this.subscriptions;
+    if (!subscriptions || _.isEmpty(subscriptions)) return;
+    // Just to be sure we don't set duplicate
+    this.unsetSubscriptions(subscriptions);
+
+    _.each(subscriptions, function (subscription, channel) {
+      var once;
+      if (subscription.$once) {
+        subscription = subscription.$once;
+        once = true;
       }
-    },
-
-    /**
-     * Cancel subscription
-     *
-     * @param channel
-     * @param fn
-     * @param context
-     */
-
-    unsubscribe: function(channel, fn, context){
-      if (!channels[channel]) return;
-      context = context || this;
-      var subscription;
-      for (var i = 0; i < channels[channel].length; i++) {
-        subscription = channels[channel][i];
-        if (subscription.fn === fn && subscription.context === context) {
-          channels[channel].splice(i, 1);
-          i--;
-        }
+      if (_.isString(subscription)) {
+        subscription = this[subscription];
       }
-    },
-
-    /**
-     * Subscribing to one event only
-     *
-     * @param channel
-     * @param subscription
-     * @param context
-     */
-    subscribeOnce: function (channel, subscription, context) {
-      Backbone.Mediator.subscribe(channel, subscription, context, true);
-    }
-
-  };
+      Backbone.Mediator.subscribe(channel, subscription, this, once);
+    }, this);
+  },
 
   /**
-   * Allow to define convention-based subscriptions
-   * as an 'subscriptions' hash on a view. Subscriptions
-   * can then be easily setup and cleaned.
-   *
-   * @class
+   * Unsubscribe to each subscription
+   * @param {Object} [subscriptions] An optional hash of subscription to remove
    */
+  unsetSubscriptions: function (subscriptions) {
+    subscriptions = subscriptions || this.subscriptions;
+    if (!subscriptions || _.isEmpty(subscriptions)) return;
+    _.each(subscriptions, function (subscription, channel) {
+      if (_.isString(subscription)) {
+        subscription = this[subscription];
+      }
+      Backbone.Mediator.unsubscribe(channel, subscription.$once || subscription, this);
+    }, this);
+  }
+};
 
+/**
+ * @lends Backbone.View.prototype
+ */
+_.extend(Backbone.View.prototype, Subscriber);
 
-  Subscriber = {
-
-    /**
-     * Extend delegateEvents() to set subscriptions
-     */
-    delegateEvents: function(){
-      delegateEvents.apply(this, arguments);
-      this.setSubscriptions();
-    },
-
-    /**
-     * Extend undelegateEvents() to unset subscriptions
-     */
-    undelegateEvents: function(){
-      undelegateEvents.apply(this, arguments);
-      this.unsetSubscriptions();
-    },
-
-    /**
-     * Extend remove() to remove subscriptions.
-     */
-    remove: function(){
-      this.unsetSubscriptions();
-      remove.apply(this, arguments);
-    },
-
-    /** @property {Object} List of subscriptions, to be defined */
-    subscriptions: {},
-
-    /**
-     * Subscribe to each subscription
-     * @param {Object} [subscriptions] An optional hash of subscription to add
-     */
-
-    setSubscriptions: function(subscriptions){
-      if (subscriptions) _.extend(this.subscriptions || {}, subscriptions);
-      subscriptions = subscriptions || this.subscriptions;
-      if (!subscriptions || _.isEmpty(subscriptions)) return;
-      // Just to be sure we don't set duplicate
-      this.unsetSubscriptions(subscriptions);
-
-      _.each(subscriptions, function(subscription, channel){
-        var once;
-        if (subscription.$once) {
-          subscription = subscription.$once;
-          once = true;
-        }
-        if (_.isString(subscription)) {
-          subscription = this[subscription];
-        }
-        Backbone.Mediator.subscribe(channel, subscription, this, once);
-      }, this);
-    },
-
-    /**
-     * Unsubscribe to each subscription
-     * @param {Object} [subscriptions] An optional hash of subscription to remove
-     */
-    unsetSubscriptions: function(subscriptions){
-      subscriptions = subscriptions || this.subscriptions;
-      if (!subscriptions || _.isEmpty(subscriptions)) return;
-      _.each(subscriptions, function(subscription, channel){
-        if (_.isString(subscription)) {
-          subscription = this[subscription];
-        }
-        Backbone.Mediator.unsubscribe(channel, subscription.$once || subscription, this);
-      }, this);
-    }
-  };
-
+/**
+ * @lends Backbone.Mediator
+ */
+_.extend(Backbone.Mediator, {
   /**
-   * @lends Backbone.View.prototype
+   * Shortcut for publish
+   * @function
    */
-  _.extend(Backbone.View.prototype, Subscriber);
-
+  pub: Backbone.Mediator.publish,
   /**
-   * @lends Backbone.Mediator
+   * Shortcut for subscribe
+   * @function
    */
-  _.extend(Backbone.Mediator, {
-    /**
-     * Shortcut for publish
-     * @function
-     */
-    pub: Backbone.Mediator.publish,
-    /**
-     * Shortcut for subscribe
-     * @function
-     */
-    sub: Backbone.Mediator.subscribe
-  });
-
-  return Backbone;
-
+  sub: Backbone.Mediator.subscribe
 });
+
+export default Backbone.Mediator;
