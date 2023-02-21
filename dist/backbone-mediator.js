@@ -36,6 +36,13 @@
    *
    *  <a href="https://github.com/chalbert/Backbone-Mediator">More details & documentation</a>
    *
+   * This is an updated version, available at:
+   * <a href="https://github.com/drc-devs/Backbone-Mediator">Github</a>
+   * Changelog:
+   *   2023-02-21
+   *     - Merged with 1.0.0 (54cb31a928d55a54c67ce34f697e365ec84b6279)
+   *     - Removed getChannels, as this is no longer used. This is all proxied to Backbone's eventing system.
+   *
    * @author Nicolas Gilbert
    *
    * @requires _
@@ -53,7 +60,10 @@
   _delegateEvents = Backbone.View.prototype.delegateEvents,
 
   /** @borrows Backbone.View#delegateEvents */
-  _undelegateEvents = Backbone.View.prototype.undelegateEvents;
+  _undelegateEvents = Backbone.View.prototype.undelegateEvents,
+
+  /** @borrows Backbone.View#remove */
+  _remove = Backbone.View.prototype.remove;
 
   /**
    * @class
@@ -103,6 +113,14 @@
     undelegateEvents: function undelegateEvents() {
       _undelegateEvents.apply(this, arguments);
       this.unsetSubscriptions();
+    },
+
+    /**
+     * Extend remove() to remove subscriptions.
+     */
+    remove: function remove() {
+      this.unsetSubscriptions();
+      _remove.apply(this, arguments);
     },
 
     /** @property {Object} List of subscriptions, to be defined */
